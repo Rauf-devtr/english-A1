@@ -24,4 +24,4 @@ A1 seviyesindeki Temel İngilizce kelimeleri öğrenmek, test etmek ve pekiştir
 
 1. Proje dosyalarını klonlayın veya indirin:
    ```bash
-   git clone 
+   git clone https://github.com/Rauf-devtr/english-A1
