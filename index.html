@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A1 İngilizce · Kelime Öğren</title>
+<style>
+  :root{
+    --bg:#0D0F14;
+    --surface:#161922;
+    --surface-2:#1E222D;
+    --border: rgba(255,255,255,.08);
+    --text:#F3F4F7;
+    --text-soft:#8A93A6;
+    --amber:#FDB750;
+    --amber-soft: rgba(253,183,80,.14);
+    --mint:#34D399;
+    --coral:#F76E6E;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background: radial-gradient(1200px 600px at 50% -10%, #191d29 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family: -apple-system, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    min-height:100vh;
+    display:flex; flex-direction:column;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{
+    max-width:520px; margin:0 auto; width:100%;
+    display:flex; flex-direction:column; flex:1;
+    min-height:100vh;
+  }
+
+  /* ---- Header ---- */
+  header{
+    padding:1.4rem 1.2rem .9rem;
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap:1rem;
+  }
+  .brand h1{
+    margin:0; font-size:1.28rem; font-weight:700; letter-spacing:-.01em;
+  }
+  .brand p{
+    margin:.3rem 0 0; font-size:.82rem; color:var(--text-soft);
+  }
+  .stat{
+    flex-shrink:0; text-align:right;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:.5rem .7rem;
+  }
+  .stat .n{ font-size:1.05rem; font-weight:700; color:var(--amber); line-height:1; }
+  .stat .l{ font-size:.66rem; color:var(--text-soft); margin-top:.15rem; }
+
+  main{ flex:1; padding:0 1.2rem 1.4rem; overflow-y:auto; }
+
+  /* ---- Screens ---- */
+  .screen{ display:none; }
+  .screen.active{ display:block; animation: rise .28s ease; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---- Menu tiles ---- */
+  .tiles{ display:flex; flex-direction:column; gap:.7rem; margin-top:.4rem; }
+  .tile{
+    display:flex; align-items:center; gap:.9rem;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:1rem 1.05rem;
+    cursor:pointer; text-align:left; color:var(--text);
+    font-family:inherit;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .tile:hover{ border-color: rgba(253,183,80,.4); transform: translateY(-1px); }
+  .tile:active{ transform: translateY(0); }
+  .tile .ico{
+    width:42px; height:42px; border-radius:11px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.15rem;
+  }
+  .tile .body{ flex:1; min-width:0; }
+  .tile .title{ font-weight:600; font-size:.98rem; }
+  .tile .desc{ font-size:.79rem; color:var(--text-soft); margin-top:.15rem; }
+  .tile .chev{ color:var(--text-soft); font-size:1.1rem; }
+
+  .tile.study .ico{ background: rgba(253,183,80,.16); color:var(--amber); }
+  .tile.test .ico{ background: rgba(52,211,153,.16); color:var(--mint); }
+  .tile.repeat .ico{ background: rgba(247,110,110,.16); color:var(--coral); }
+
+  /* ---- Sub-screen top bar ---- */
+  .topbar{
+    display:flex; align-items:center; gap:.7rem; margin-bottom:1rem; padding-top:.2rem;
+  }
+  .back{
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    width:34px; height:34px; border-radius:10px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:1rem;
+    flex-shrink:0;
+  }
+  .back:hover{ border-color:rgba(255,255,255,.2); }
+  .screen-title{ font-size:1.05rem; font-weight:700; margin:0; }
+
+  /* ---- Study list ---- */
+  .search-wrap{ position:relative; margin-bottom:1rem; }
+  .search-wrap input{
+    width:100%; padding:.68rem .9rem .68rem 2.3rem;
+    border-radius:12px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text); font-size:.9rem;
+    font-family:inherit;
+  }
+  .search-wrap input:focus{ outline:none; border-color:var(--amber); }
+  .search-wrap::before{
+    content:"⌕"; position:absolute; left:.8rem; top:50%; transform:translateY(-50%);
+    color:var(--text-soft); font-size:1.05rem;
+  }
+  .word-list{ list-style:none; margin:0; padding:0; }
+  .word-list li{
+    display:flex; align-items:center; gap:.8rem;
+    padding:.72rem .1rem;
+    border-bottom:1px solid var(--border);
+  }
+  .word-list li .idx{
+    font-size:.7rem; color:var(--text-soft); width:1.8rem; flex-shrink:0; text-align:right;
+  }
+  .word-list li .en{ font-weight:600; flex:1; font-size:.95rem; }
+  .word-list li .tr{ color:var(--mint); font-size:.88rem; text-align:right; }
+  .empty-note{ color:var(--text-soft); font-size:.85rem; text-align:center; padding:2rem 0; }
+
+  /* ---- Quiz card ---- */
+  .quiz-card{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:18px; padding:1.5rem 1.3rem 1.4rem;
+  }
+  .progress-track{
+    height:5px; border-radius:99px; background:var(--surface-2); overflow:hidden; margin-bottom:1.1rem;
+  }
+  .progress-fill{ height:100%; background:var(--amber); border-radius:99px; transition:width .25s ease; }
+  .progress-label{
+    font-size:.75rem; color:var(--text-soft); display:flex; justify-content:space-between; margin-bottom:.9rem;
+  }
+  .prompt-word{
+    font-size:2.1rem; font-weight:700; letter-spacing:-.01em; text-align:center;
+    margin: .6rem 0 1.3rem;
+  }
+  .answer-row{ display:flex; gap:.55rem; }
+  .answer-row input{
+    flex:1; padding:.8rem 1rem; font-size:1rem; border-radius:12px;
+    border:1px solid var(--border); background:var(--surface-2); color:var(--text);
+    font-family:inherit;
+  }
+  .answer-row input:focus{ outline:none; border-color:var(--amber); }
+  .answer-row button{
+    padding:.8rem 1.1rem; border-radius:12px; border:none; cursor:pointer;
+    background:var(--amber); color:#1A1300; font-weight:700; font-size:.9rem;
+    font-family:inherit;
+  }
+  .answer-row button:disabled{ opacity:.5; }
+  .feedback{
+    margin-top:.9rem; min-height:1.3rem; font-size:.92rem; font-weight:600; text-align:center;
+  }
+  .feedback.correct{ color:var(--mint); }
+  .feedback.wrong{ color:var(--coral); }
+
+  .quiz-footer{
+    display:flex; justify-content:center; margin-top:1.2rem;
+  }
+  .quiz-footer button{
+    background:none; border:none; color:var(--text-soft); cursor:pointer;
+    font-family:inherit; font-size:.8rem; text-decoration:underline;
+    text-underline-offset:3px;
+  }
+  .quiz-footer button:hover{ color:var(--text); }
+
+  /* ---- Result ---- */
+  .result-box{ text-align:center; padding:2.2rem 1rem 1rem; }
+  .result-box .tag{ font-size:.8rem; color:var(--text-soft); }
+  .result-box .score{
+    font-size:3rem; font-weight:800; margin:.5rem 0; letter-spacing:-.02em;
+  }
+  .result-box .score .of{ color:var(--text-soft); font-size:1.6rem; font-weight:600; }
+  .result-box .breakdown{ font-size:.85rem; color:var(--text-soft); }
+  .result-box .restart{
+    margin-top:1.4rem; padding:.75rem 1.4rem; border-radius:12px; border:none;
+    background:var(--amber); color:#1A1300; font-weight:700; font-size:.9rem; cursor:pointer;
+    font-family:inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .tile{ transition:none; }
+    .screen.active{ animation:none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <h1>A1 İngilizce</h1>
+      <p>Kelime öğren, test et, pekiştir.</p>
+    </div>
+    <div class="stat">
+      <div class="n" id="wordCountNum"></div>
+      <div class="l">kelime</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- MENU -->
+    <section class="screen active" id="screen-menu">
+      <div class="tiles">
+        <button class="tile study" data-mode="study">
+          <span class="ico">📖</span>
+          <span class="body">
+            <span class="title">Kelimelere Çalış</span>
+            <span class="desc">Tüm listeyi İngilizce – Türkçe incele</span>
+          </span>
+          <span class="chev">›</span>
+        </button>
+        <button class="tile test" data-mode="test">
+          <span class="ico">✎</span>
+          <span class="body">
+            <span class="title">İngilizce → Türkçe Test</span>
+            <span class="desc">Karışık sırayla sorulur, skorunu gör</span>
+          </span>
+          <span class="chev">›</span>
+        </button>
+        <button class="tile repeat" data-mode="repeat">
+          <span class="ico">↻</span>
+          <span class="body">
+            <span class="title">Türkçe → İngilizce Tekrar</span>
+            <span class="desc">Doğru yazana kadar aynı kelime döner</span>
+          </span>
+          <span class="chev">›</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STUDY -->
+    <section class="screen" id="screen-study">
+      <div class="topbar">
+        <button class="back" data-back>←</button>
+        <p class="screen-title">Kelimelere Çalış</p>
+      </div>
+      <div class="search-wrap">
+        <input type="text" id="studySearch" placeholder="Kelime ara...">
+      </div>
+      <ul class="word-list" id="studyList"></ul>
+    </section>
+
+    <!-- TEST EN->TR -->
+    <section class="screen" id="screen-test">
+      <div class="topbar">
+        <button class="back" data-back>←</button>
+        <p class="screen-title">İngilizce → Türkçe</p>
+      </div>
+      <div id="testArea"></div>
+    </section>
+
+    <!-- REPEAT TR->EN -->
+    <section class="screen" id="screen-repeat">
+      <div class="topbar">
+        <button class="back" data-back>←</button>
+        <p class="screen-title">Türkçe → İngilizce</p>
+      </div>
+      <div id="repeatArea"></div>
+    </section>
+  </main>
+
+</div>
+
+<script>
+const WORDS = {
+  "about": "hakkında",
+  "above": "üzerinde",
+  "across": "karşısında",
+  "action": "eylem",
+  "activity": "etkinlik",
+  "actor": "aktör",
+  "actress": "aktris",
+  "add": "eklemek",
+  "address": "adres",
+  "adult": "yetişkin",
+  "advice": "tavsiye",
+  "afraid": "korkmuş",
+  "after": "sonra",
+  "afternoon": "öğleden sonra",
+  "again": "tekrar",
+  "age": "yaş",
+  "ago": "önce",
+  "agree": "katılmak (fikre)",
+  "air": "hava",
+  "airport": "havalimanı",
+  "all": "bütün",
+  "also": "ayrıca",
+  "always": "her zaman",
+  "amazing": "harika",
+  "and": "ve",
+  "angry": "kızgın",
+  "animal": "hayvan",
+  "another": "başka",
+  "answer": "cevap",
+  "any": "hiç",
+  "anyone": "hiç kimse",
+  "anything": "hiçbir şey",
+  "apartment": "daire",
+  "apple": "elma",
+  "april": "nisan",
+  "area": "alan",
+  "arm": "kol",
+  "around": "etrafında",
+  "arrive": "varmak",
+  "art": "sanat",
+  "article": "makale",
+  "artist": "sanatçı",
+  "as": "olarak",
+  "ask": "sormak",
+  "at": "de/da ekinde",
+  "august": "ağustos",
+  "aunt": "teyze/hala",
+  "autumn": "sonbahar",
+  "away": "uzakta",
+  "awesome": "harika",
+  "baby": "bebek",
+  "back": "geri/arka",
+  "bad": "kötü",
+  "bag": "çanta",
+  "ball": "top",
+  "banana": "muz",
+  "band": "müzik grubu",
+  "bank": "banka",
+  "bar": "bar",
+  "baseball": "beyzbol",
+  "basket": "sepet",
+  "basketball": "basketbol",
+  "bath": "banyo",
+  "bathroom": "banyo odası",
+  "be": "olmak",
+  "beach": "plaj",
+  "beautiful": "güzel",
+  "because": "çünkü",
+  "become": "olmak/gelişmek",
+  "bed": "yatak",
+  "bedroom": "yatak odası",
+  "beer": "bira",
+  "before": "önce",
+  "begin": "başlamak",
+  "beginning": "başlangıç",
+  "behind": "arkasında",
+  "believe": "inanmak",
+  "below": "altında",
+  "belt": "kemer",
+  "best": "en iyi",
+  "better": "daha iyi",
+  "between": "arasında",
+  "big": "büyük",
+  "bike": "bisiklet",
+  "bill": "fatura",
+  "bird": "kuş",
+  "birthday": "doğum günü",
+  "biscuit": "bisküvi",
+  "black": "siyah",
+  "blanket": "battaniye",
+  "blog": "blog",
+  "blonde": "sarışın",
+  "blood": "kan",
+  "blue": "mavi",
+  "board": "tahta",
+  "boat": "tekne",
+  "body": "vücut",
+  "bone": "kemik",
+  "book": "kitap",
+  "boot": "bot",
+  "bored": "sıkılmış",
+  "boring": "sıkıcı",
+  "born": "doğmuş",
+  "both": "her ikisi",
+  "bottle": "şişe",
+  "bowl": "kase",
+  "box": "kutu",
+  "boy": "erkek çocuk",
+  "boyfriend": "erkek arkadaş",
+  "brain": "beyin",
+  "bread": "ekmek",
+  "break": "mola/kırmak",
+  "breakfast": "kahvaltı",
+  "bring": "getirmek",
+  "brother": "erkek kardeş",
+  "brown": "kahverengi",
+  "build": "inşa etmek",
+  "building": "bina",
+  "bus": "otobüs",
+  "business": "iş",
+  "busy": "meşgul",
+  "but": "fakat",
+  "butter": "tereyağı",
+  "buy": "satın almak",
+  "by": "tarafından/ile",
+  "bye": "hoşça kal",
+  "cafe": "kafe",
+  "cake": "pasta",
+  "call": "aramak/çağırmak",
+  "camera": "kamera",
+  "can": "ebilmek",
+  "candle": "mum",
+  "capital": "başkent",
+  "car": "araba",
+  "card": "kart",
+  "career": "kariyer",
+  "carpet": "halı",
+  "carrot": "havuç",
+  "carry": "taşımak",
+  "cat": "kedi",
+  "cd": "cd",
+  "ceiling": "tavan",
+  "cent": "sent",
+  "center": "merkez",
+  "chair": "sandalye",
+  "change": "değiştirmek",
+  "chart": "grafik",
+  "cheap": "ucuz",
+  "check": "kontrol etmek",
+  "cheek": "yanak",
+  "cheese": "peynir",
+  "chicken": "tavuk",
+  "child": "çocuk",
+  "chin": "çene",
+  "chocolate": "çikolata",
+  "choose": "seçmek",
+  "cinema": "sinema",
+  "city": "şehir",
+  "class": "ders/sınıf",
+  "classroom": "sınıf",
+  "clean": "temiz",
+  "climb": "tırmanmak",
+  "clock": "saat",
+  "close": "kapatmak",
+  "clothes": "giysiler",
+  "cloudy": "bulutlu",
+  "club": "kulüp",
+  "coat": "mont",
+  "coffee": "kahve",
+  "cold": "soğuk",
+  "college": "kolej",
+  "color": "renk",
+  "comb": "tarak",
+  "come": "gelmek",
+  "common": "yaygın",
+  "company": "şirket",
+  "compare": "karşılaştırmak",
+  "complete": "tamamlamak",
+  "computer": "bilgisayar",
+  "concert": "konser",
+  "conversation": "sohbet",
+  "cook": "yemek pişirmek",
+  "cooking": "yemek pişirme",
+  "cool": "havalı/serin",
+  "correct": "doğru",
+  "cost": "maliyet",
+  "country": "ülke",
+  "course": "kurs",
+  "cousin": "kuzen",
+  "cow": "inek",
+  "cream": "krema",
+  "create": "oluşturmak",
+  "culture": "kültür",
+  "cup": "fincan",
+  "curtain": "perde",
+  "customer": "müşteri",
+  "cut": "kesmek",
+  "dad": "baba",
+  "dance": "dans etmek",
+  "dancer": "dansçı",
+  "dancing": "dans",
+  "dangerous": "tehlikeli",
+  "dark": "karanlık",
+  "date": "tarih",
+  "daughter": "kız evlat",
+  "day": "gün",
+  "dear": "sevgili",
+  "december": "aralık",
+  "decide": "karar vermek",
+  "degree": "derece",
+  "delicious": "lezzetli",
+  "describe": "tanımlamak",
+  "desk": "çalışma masası",
+  "detail": "detay",
+  "dictionary": "sözlük",
+  "die": "ölmek",
+  "diet": "diyet",
+  "difference": "fark",
+  "different": "farklı",
+  "difficult": "zor",
+  "dinner": "akşam yemeği",
+  "dirty": "kirli",
+  "discuss": "tartışmak",
+  "dish": "tabak/yemek",
+  "do": "yapmak",
+  "doctor": "doktor",
+  "dog": "köpek",
+  "dollar": "dolar",
+  "door": "kapı",
+  "down": "aşağı",
+  "downstairs": "alt kat",
+  "draw": "çizmek",
+  "dress": "elbise",
+  "drink": "içmek",
+  "drive": "sürmek",
+  "driver": "sürücü",
+  "during": "boyunca",
+  "dvd": "dvd",
+  "each": "her biri",
+  "ear": "kulak",
+  "early": "erken",
+  "earring": "küpe",
+  "earth": "toprak/dünya",
+  "east": "doğu",
+  "easy": "kolay",
+  "eat": "yemek yemek",
+  "egg": "yumurta",
+  "eight": "sekiz",
+  "eighteen": "on sekiz",
+  "eighty": "seksen",
+  "elevator": "asansör",
+  "eleven": "on bir",
+  "else": "başka",
+  "email": "eposta",
+  "end": "son",
+  "enjoy": "keyif almak",
+  "enough": "yeterli",
+  "euro": "euro",
+  "even": "hatta",
+  "evening": "akşam",
+  "event": "etkinlik",
+  "ever": "hiç",
+  "every": "her",
+  "everybody": "herkes",
+  "everyone": "herkes",
+  "everything": "her şey",
+  "exam": "sınav",
+  "example": "örnek",
+  "excited": "heyecanlı",
+  "exciting": "heyecan verici",
+  "exercise": "egzersiz",
+  "expensive": "pahalı",
+  "explain": "açıklamak",
+  "extra": "ekstra",
+  "eye": "göz",
+  "face": "yüz",
+  "fact": "gerçek",
+  "fall": "düşmek",
+  "family": "aile",
+  "famous": "ünlü",
+  "farm": "çiftlik",
+  "farmer": "çiftçi",
+  "fast": "hızlı",
+  "fat": "şişman",
+  "father": "baba",
+  "favorite": "favori",
+  "february": "şubat",
+  "feel": "hissetmek",
+  "feeling": "hissiyat",
+  "fence": "çit",
+  "festival": "festival",
+  "few": "az",
+  "fifteen": "on beş",
+  "fifty": "elli",
+  "fill": "doldurmak",
+  "film": "film",
+  "final": "final",
+  "find": "bulmak",
+  "fine": "iyi",
+  "finger": "parmak (el)",
+  "finish": "bitirmek",
+  "fire": "ateş",
+  "first": "ilk",
+  "fish": "balık",
+  "five": "beş",
+  "flat": "daire",
+  "flight": "uçuş",
+  "floor": "zemin/kat",
+  "flower": "çiçek",
+  "fly": "uçmak",
+  "follow": "takip etmek",
+  "food": "yecek",
+  "foot": "ayak",
+  "football": "futbol",
+  "for": "için",
+  "forest": "orman",
+  "forget": "unutmak",
+  "fork": "çatal",
+  "form": "form",
+  "forty": "kırk",
+  "four": "dört",
+  "fourteen": "on dört",
+  "free": "ücretsiz/özgür",
+  "freezer": "dondurucu",
+  "friday": "cuma",
+  "fridge": "buzdolabı",
+  "friend": "arkadaş",
+  "friendly": "samimi",
+  "from": "den/dan",
+  "front": "ön",
+  "fruit": "meyve",
+  "full": "dolu",
+  "fun": "eğlence",
+  "funny": "komik",
+  "future": "gelecek",
+  "game": "oyun",
+  "garden": "bahçe",
+  "gas": "gaz",
+  "gate": "kapı (bahçe)",
+  "get": "almak/edinmek",
+  "girl": "kız çocuk",
+  "girlfriend": "kız arkadaş",
+  "give": "vermek",
+  "glass": "bardak",
+  "glasses": "gözlük",
+  "glove": "eldiven",
+  "go": "gitmek",
+  "good": "iyi",
+  "goodbye": "hoşça kal",
+  "grandfather": "dede",
+  "grandmother": "nine",
+  "grandparent": "büyükanne/büyükbaba",
+  "grass": "çim",
+  "great": "harika",
+  "green": "yeşil",
+  "grey": "gri",
+  "group": "grup",
+  "grow": "büyümek",
+  "guess": "tahmin etmek",
+  "guitar": "gitar",
+  "guy": "adam",
+  "hair": "saç",
+  "half": "yarım",
+  "hand": "el",
+  "happen": "olmak/meydana gelmek",
+  "happy": "mutlu",
+  "hard": "zor/sert",
+  "hat": "şapka",
+  "hate": "nefret etmek",
+  "have": "sahip olmak",
+  "he": "o (erkek)",
+  "head": "baş/kafa",
+  "health": "sağlık",
+  "healthy": "sağlıklı",
+  "hear": "duymak",
+  "heart": "kalp",
+  "heating": "ısıtma",
+  "heavy": "ağır",
+  "hello": "merhaba",
+  "help": "yardım etmek",
+  "her": "onun (kadın)",
+  "here": "burada",
+  "hey": "hey",
+  "hi": "selam",
+  "high": "yüksek",
+  "hill": "tepe",
+  "him": "ona/onu (erkek)",
+  "his": "onun (erkek)",
+  "history": "tarih",
+  "hobby": "hobi",
+  "holiday": "tatil",
+  "home": "ev",
+  "homework": "ev ödevi",
+  "hope": "umut etmek",
+  "horse": "at",
+  "hospital": "hastane",
+  "hot": "sıcak",
+  "hotel": "otel",
+  "hour": "saat",
+  "house": "ev",
+  "how": "nasıl",
+  "however": "ancak",
+  "hundred": "yüz",
+  "hungry": "aç",
+  "husband": "koca",
+  "i": "ben",
+  "ice": "buz",
+  "idea": "fikir",
+  "if": "eğer",
+  "imagine": "hayal etmek",
+  "important": "önemli",
+  "improve": "geliştirmek",
+  "in": "içinde",
+  "include": "dahil etmek",
+  "information": "bilgi",
+  "interest": "ilgi",
+  "interested": "ilgili",
+  "interesting": "ilginç",
+  "internet": "internet",
+  "interview": "mülakat",
+  "into": "içine",
+  "introduce": "tanıtmak",
+  "island": "ada",
+  "it": "o (cansız/hayvan)",
+  "item": "öğe",
+  "its": "onun (cansız/hayvan)",
+  "jacket": "ceket",
+  "january": "ocak",
+  "jewelry": "mücevher",
+  "job": "iş",
+  "join": "katılmak",
+  "juice": "meyve suyu",
+  "july": "temmuz",
+  "june": "haziran",
+  "just": "sadece",
+  "keep": "tutmak/korumak",
+  "key": "anahtar",
+  "kid": "çocuk",
+  "kind": "tür/nazik",
+  "kitchen": "mutfak",
+  "knife": "bıçak",
+  "know": "bilmek",
+  "lake": "göl",
+  "lamp": "lamba",
+  "land": "kara/toprak",
+  "language": "dil",
+  "large": "geniş/büyük",
+  "last": "son",
+  "late": "geç",
+  "later": "sonra",
+  "laugh": "gülmek",
+  "leaf": "yaprak",
+  "learn": "öğrenmek",
+  "leave": "ayrılmak",
+  "left": "sol",
+  "leg": "bacak",
+  "lesson": "ders",
+  "let": "izin vermek",
+  "letter": "mektup/harf",
+  "library": "kütüphane",
+  "lie": "yalan söylemek/uzanmak",
+  "life": "yaşam",
+  "light": "ışık/hafif",
+  "like": "sevmek/gibi",
+  "line": "çizgi/hat",
+  "lion": "aslan",
+  "list": "liste",
+  "listen": "dinlemek",
+  "little": "küçük/az",
+  "live": "yaşamak",
+  "local": "yerel",
+  "lock": "kilit",
+  "long": "uzun",
+  "look": "bakmak",
+  "lose": "kaybetmek",
+  "lot": "çok",
+  "love": "sevmek",
+  "lunch": "öğle yemeği",
+  "lung": "akciğer",
+  "machine": "makine",
+  "magazine": "dergi",
+  "main": "ana",
+  "make": "yapmak",
+  "man": "adam",
+  "many": "birçok",
+  "map": "harita",
+  "march": "mart",
+  "market": "pazar/market",
+  "married": "evli",
+  "match": "eşleşme/maç",
+  "may": "mayıs",
+  "maybe": "belki",
+  "me": "bana/beni",
+  "meal": "yemek",
+  "mean": "anlamına gelmek",
+  "meaning": "anlam",
+  "meat": "et",
+  "meet": "buluşmak",
+  "meeting": "toplantı",
+  "member": "üye",
+  "menu": "menü",
+  "message": "mesaj",
+  "meter": "metre",
+  "microwave": "mikrodalga",
+  "midnight": "gece yarısı",
+  "mile": "mil",
+  "milk": "süt",
+  "million": "milyon",
+  "minute": "dakika",
+  "mirror": "ayna",
+  "miss": "özlemek/kaçırmak",
+  "mistake": "hata",
+  "model": "model",
+  "modern": "modern",
+  "moment": "an",
+  "monday": "pazartesi",
+  "money": "para",
+  "monkey": "maymun",
+  "month": "ay",
+  "moon": "ay (gök cismi)",
+  "more": "daha fazla",
+  "morning": "sabah",
+  "most": "en çok",
+  "mother": "anne",
+  "mountain": "dağ",
+  "mouse": "fare",
+  "mouth": "ağız",
+  "move": "hareket etmek",
+  "movie": "film",
+  "much": "çok",
+  "mum": "anne",
+  "museum": "müze",
+  "music": "müzik",
+  "musician": "müzisyen",
+  "must": "zorunda olmak",
+  "my": "benim",
+  "nail": "tırnak",
+  "name": "isim",
+  "napkin": "peçete",
+  "national": "ulusal",
+  "natural": "doğal",
+  "near": "yakın",
+  "neck": "boyun",
+  "necklace": "kolye",
+  "need": "ihtiyacı olmak",
+  "neighbor": "komşu",
+  "never": "asla",
+  "new": "yeni",
+  "news": "haberler",
+  "newspaper": "gazete",
+  "next": "sonraki",
+  "nice": "hoş/güzel",
+  "night": "gece",
+  "nine": "dokuz",
+  "nineteen": "on dokuz",
+  "ninety": "doksan",
+  "no": "hayır",
+  "nobody": "hiç kimse",
+  "noise": "gürültü",
+  "noon": "öğle vakti",
+  "north": "kuzey",
+  "nose": "burun",
+  "not": "değil",
+  "note": "not",
+  "nothing": "hiçbir şey",
+  "november": "kasım",
+  "now": "şimdi",
+  "number": "numara",
+  "nurse": "hemşire",
+  "o'clock": "saat",
+  "object": "nesne",
+  "ocean": "okyanus",
+  "october": "ekim",
+  "of": "nin/nin ekinde",
+  "off": "kapalı",
+  "office": "ofis",
+  "often": "sık sık",
+  "oh": "oh",
+  "oil": "yağ",
+  "ok": "tamam",
+  "old": "eski/yaşlı",
+  "on": "üzerinde",
+  "once": "bir kez",
+  "one": "bir",
+  "onion": "soğan",
+  "online": "çevrim içi",
+  "only": "sadece",
+  "open": "açık/açmak",
+  "opinion": "fikir",
+  "opposite": "karşıt",
+  "or": "veya",
+  "orange": "turuncu/portakal",
+  "order": "sipariş vermek",
+  "other": "diğer",
+  "our": "bizim",
+  "out": "dışarı",
+  "outside": "dışarısı",
+  "oven": "fırın",
+  "over": "üzerinde",
+  "own": "kendi",
+  "page": "sayfa",
+  "paint": "boyamak",
+  "painting": "tablo/boyama",
+  "pair": "çift",
+  "paper": "kağıt",
+  "paragraph": "paragraf",
+  "parent": "ebeveyn",
+  "park": "park",
+  "part": "parça",
+  "partner": "ortak",
+  "party": "parti",
+  "passport": "pasaport",
+  "past": "geçmiş",
+  "pay": "ödemek",
+  "pen": "kalem",
+  "pencil": "kurşun kalem",
+  "people": "insanlar",
+  "pepper": "biber",
+  "perfect": "mükemmel",
+  "period": "dönem",
+  "person": "kişi",
+  "personal": "kişisel",
+  "phone": "telefon",
+  "photo": "fotoğraf",
+  "phrase": "ifade",
+  "piano": "piyano",
+  "picture": "resim",
+  "piece": "parça",
+  "pig": "domuz",
+  "pillow": "yastık",
+  "pink": "pembe",
+  "place": "yer",
+  "plan": "plan",
+  "plane": "uçak",
+  "plant": "bitki",
+  "plate": "tabak",
+  "play": "oynamak",
+  "player": "oyuncu",
+  "please": "lütfen",
+  "point": "nokta",
+  "police": "polis",
+  "policeman": "polis memuru",
+  "pool": "havuz",
+  "poor": "fakir",
+  "popular": "popüler",
+  "possible": "mümkün",
+  "post": "posta",
+  "poster": "afiş",
+  "potato": "patates",
+  "pound": "sterlin",
+  "practice": "pratik",
+  "prefer": "tercih etmek",
+  "prepare": "hazırlamak",
+  "present": "hediye/sunmak",
+  "pretty": "sevimli/oldukça",
+  "price": "fiyat",
+  "problem": "problem",
+  "product": "ürün",
+  "program": "program",
+  "project": "proje",
+  "purple": "mor",
+  "purse": "el çantası",
+  "put": "koymak",
+  "quarter": "çeyrek",
+  "question": "soru",
+  "quick": "hızlı",
+  "quickly": "hızlıca",
+  "quiet": "sessiz",
+  "quite": "oldukça",
+  "radio": "radyo",
+  "rain": "yağmur",
+  "rainy": "yağmurlu",
+  "read": "okumak",
+  "reader": "okuyucu",
+  "reading": "okuma",
+  "ready": "hazır",
+  "real": "gerçek",
+  "really": "gerçekten",
+  "reason": "neden",
+  "red": "kırmızı",
+  "relax": "rahatlamak",
+  "remember": "hatırlamak",
+  "repeat": "tekrar etmek",
+  "report": "rapor",
+  "restaurant": "restoran",
+  "result": "sonuç",
+  "return": "geri dönmek",
+  "rice": "pirinç",
+  "rich": "zengin",
+  "ride": "binmek",
+  "right": "sağ/doğru",
+  "ring": "yüzük",
+  "river": "nehir",
+  "road": "yol",
+  "rock": "kaya",
+  "roof": "çatı",
+  "room": "oda",
+  "sand": "kum",
+  "saturday": "cumartesi",
+  "scarf": "atkı",
+  "school": "okul",
+  "sea": "deniz",
+  "season": "mevsim",
+  "see": "görmek",
+  "sell": "satmak",
+  "send": "göndermek",
+  "seven": "yedi",
+  "shape": "şekil",
+  "share": "paylaşmak",
+  "she": "o (kadın)",
+  "sheep": "koyun",
+  "sheet": "çarşaf",
+  "shelf": "raf",
+  "shirt": "gömlek",
+  "shoe": "ayakkabı",
+  "shop": "dükkan",
+  "short": "kısa",
+  "should": "meli/malı eki (öneri)",
+  "shoulder": "omuz",
+  "show": "göstermek",
+  "shower": "duş",
+  "shy": "utangaç",
+  "sick": "hasta",
+  "side": "taraf/yan",
+  "similar": "benzer",
+  "simple": "basit",
+  "since": "den beri",
+  "sing": "şarkı söylemek",
+  "singer": "şarkıcı",
+  "sink": "lavabo",
+  "sit": "oturmak",
+  "situation": "durum",
+  "six": "altı",
+  "size": "boyut",
+  "ski": "kayak yapmak",
+  "skill": "beceri",
+  "skin": "cilt/deri",
+  "skirt": "etek",
+  "sky": "gökyüzü",
+  "sleep": "uyumak",
+  "small": "küçük",
+  "snake": "yılan",
+  "snow": "kar",
+  "snowy": "karlı",
+  "soap": "sabun",
+  "sock": "çorap",
+  "sofa": "kanepe",
+  "soft": "yumuşak",
+  "some": "biraz/bazı",
+  "somebody": "biri",
+  "someone": "biri",
+  "something": "bir şey",
+  "sometimes": "bazen",
+  "son": "oğul",
+  "song": "şarkı",
+  "sorry": "özür dilerim",
+  "sound": "ses",
+  "south": "güney",
+  "space": "uzay/alan",
+  "speak": "konuşmak",
+  "special": "özel",
+  "spell": "harflemek",
+  "spend": "harcamak",
+  "spoon": "kaşık",
+  "sport": "spor",
+  "spring": "ilkbahar",
+  "stairs": "merdiven",
+  "stand": "ayakta durmak",
+  "star": "yıldız",
+  "start": "başlamak",
+  "station": "istasyon",
+  "stay": "kalmak",
+  "still": "hala/hareketsiz",
+  "stomach": "mide/karın",
+  "stone": "taş",
+  "stop": "durmak",
+  "storm": "fırtına",
+  "story": "hikaye",
+  "stove": "ocak",
+  "strange": "garip",
+  "street": "sokak",
+  "strong": "güçlü",
+  "student": "öğrenci",
+  "study": "ders çalışmak/incelemek",
+  "stupid": "aptal",
+  "subject": "konu/ders",
+  "such": "böyle/bu kadar",
+  "sugar": "şeker",
+  "suggest": "önermek",
+  "suit": "takım elbise",
+  "summer": "yaz",
+  "sun": "güneş",
+  "sunday": "pazar",
+  "sunglasses": "güneş gözlüğü",
+  "sunny": "güneşli",
+  "supermarket": "süpermarket",
+  "sure": "emin",
+  "surprise": "sürpriz",
+  "sweater": "kazak",
+  "sweet": "tatlı",
+  "swim": "yüzmek",
+  "table": "masa",
+  "take": "almak/götürmek",
+  "talk": "konuşmak",
+  "tall": "uzun boylu",
+  "tap": "musluk",
+  "taxi": "taksi",
+  "tea": "çay",
+  "teach": "öğretmek",
+  "teacher": "öğretmen",
+  "team": "takım",
+  "teenager": "genç/ergen",
+  "television": "televizyon",
+  "tell": "anlatmak/söylemek",
+  "temperature": "sıcaklık",
+  "ten": "on",
+  "tennis": "tenis",
+  "terrible": "korkunç",
+  "test": "sınav/test",
+  "text": "mesaj/metin",
+  "than": "den/dan (kıyaslama)",
+  "thank": "teşekkür etmek",
+  "that": "o/şu",
+  "the": "belirli tanımlık (the)",
+  "their": "onların",
+  "them": "onları/onlara",
+  "then": "sonra/o zaman",
+  "there": "orada",
+  "they": "onlar",
+  "thing": "şey",
+  "think": "düşünmek",
+  "thirsty": "susamış",
+  "thirteen": "on üç",
+  "thirty": "otuz",
+  "this": "bu",
+  "those": "onlar/şunlar",
+  "thousand": "bin",
+  "three": "üç",
+  "through": "içinden/aracılığıyla",
+  "thursday": "perşembe",
+  "ticket": "bilet",
+  "tidy": "düzenli",
+  "time": "zaman/saat",
+  "tired": "yorgun",
+  "to": "e/a ekinde (yönelme)",
+  "today": "bugün",
+  "toe": "ayak parmağı",
+  "together": "birlikte",
+  "toilet": "tuvalet",
+  "tomato": "domates",
+  "tomorrow": "yarın",
+  "tonight": "bu gece",
+  "too": "ayrıca/çok fazla",
+  "tooth": "diş",
+  "toothbrush": "diş fırçası",
+  "toothpaste": "diş macunu",
+  "top": "üst/tepe",
+  "towel": "havlu",
+  "town": "kasaba",
+  "toy": "oyuncak",
+  "traffic": "trafik",
+  "train": "tren",
+  "travel": "seyahat etmek",
+  "tree": "ağaç",
+  "trousers": "pantolon",
+  "true": "doğru/gerçek",
+  "trust": "güvenmek",
+  "try": "denemek",
+  "tuesday": "salı",
+  "turn": "dönmek/sıra",
+  "twelve": "on iki",
+  "twenty": "yirmi",
+  "twice": "iki kez",
+  "type": "tür/yazmak (klavyeyle)",
+  "umbrella": "şemsiye",
+  "uncle": "amca/dayı",
+  "under": "altında",
+  "understand": "anlamak",
+  "uniform": "üniforma",
+  "university": "üniversite",
+  "up": "yukarı",
+  "us": "bizi/bize",
+  "use": "kullanmak",
+  "useful": "faydalı",
+  "usually": "genellikle",
+  "vacation": "tatil",
+  "vegetable": "sebze",
+  "video": "video",
+  "village": "köy",
+  "visit": "ziyaret etmek",
+  "voice": "ses (insan)",
+  "wait": "beklemek",
+  "wake": "uyanmak",
+  "walk": "yürümek",
+  "wall": "duvar",
+  "wallet": "cüzdan",
+  "want": "istemek",
+  "warm": "ılık/sıcak",
+  "wash": "yıkamak",
+  "watch": "kol saati",
+  "water": "su",
+  "way": "yol/şekil",
+  "we": "biz",
+  "wear": "giymek",
+  "weather": "hava durumu",
+  "wednesday": "çarşamba",
+  "week": "hafta",
+  "weekend": "hafta sonu",
+  "welcome": "hoş geldiniz",
+  "well": "iyi/kuyu",
+  "west": "batı",
+  "wet": "ıslak",
+  "what": "ne",
+  "when": "ne zaman",
+  "where": "nerede/nereye",
+  "which": "hangi",
+  "who": "kim",
+  "why": "neden/niçin",
+  "wife": "eş (kadın)",
+  "will": "ecek/acak eki (gelecek zaman)",
+  "win": "kazanmak",
+  "window": "pencere",
+  "windy": "rüzgarlı",
+  "winter": "kış",
+  "wish": "dilemek",
+  "with": "ile",
+  "without": "olmadan",
+  "woman": "kadın",
+  "wonderful": "harika",
+  "word": "kelime",
+  "worker": "işçi",
+  "world": "dünya",
+  "worry": "endişelenmek",
+  "would": "ecekti/acaktı eki (şart/geçmiş gelecek)",
+  "writer": "yazar",
+  "year": "yıl",
+  "yellow": "sarı",
+  "yes": "evet",
+  "yesterday": "dün",
+  "yet": "henüz",
+  "zero": "sıfır",
+  "zoo": "hayvanat bahçesi"
+};
+const wordEntries = Object.entries(WORDS);
+document.getElementById('wordCountNum').textContent = wordEntries.length;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function clean(text){ return text.trim().toLowerCase(); }
+
+/* Bir kelimenin birden fazla doğru karşılığı olabilir (ör: "ders/sınıf" veya
+   "o (erkek)"). Bu fonksiyon, o karşılıklardan herhangi birini yazınca doğru
+   sayılabilmesi için kabul edilebilir tüm varyantları üretir. */
+function acceptableAnswers(raw){
+  const variants = new Set();
+  raw.split('/').forEach(part=>{
+    const withParens = clean(part);
+    if(withParens) variants.add(withParens);
+    const noParens = clean(part.replace(/\([^)]*\)/g, ''));
+    if(noParens) variants.add(noParens);
+  });
+  return variants;
+}
+function isCorrectAnswer(userInput, correctRaw){
+  return acceptableAnswers(correctRaw).has(clean(userInput));
+}
+
+const screens = {
+  menu: document.getElementById('screen-menu'),
+  study: document.getElementById('screen-study'),
+  test: document.getElementById('screen-test'),
+  repeat: document.getElementById('screen-repeat'),
+};
+function showScreen(name){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+  if(name === 'test') startTest();
+  if(name === 'repeat') startRepeat();
+  if(name === 'study'){ document.getElementById('studySearch').value=''; renderStudyList(''); }
+}
+
+document.querySelectorAll('.tile').forEach(btn=>{
+  btn.addEventListener('click', ()=> showScreen(btn.dataset.mode));
+});
+document.querySelectorAll('[data-back]').forEach(btn=>{
+  btn.addEventListener('click', ()=> showScreen('menu'));
+});
+
+/* ---------- STUDY MODE ---------- */
+function renderStudyList(filter){
+  const listEl = document.getElementById('studyList');
+  const f = clean(filter);
+  listEl.innerHTML = '';
+  let shown = 0;
+  wordEntries.forEach(([en,tr], i)=>{
+    if(f && !en.toLowerCase().includes(f) && !tr.toLowerCase().includes(f)) return;
+    shown++;
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="idx">${i+1}</span><span class="en">${en}</span><span class="tr">${tr}</span>`;
+    listEl.appendChild(li);
+  });
+  if(shown === 0){
+    listEl.innerHTML = '<div class="empty-note">Eşleşen kelime bulunamadı.</div>';
+  }
+}
+document.getElementById('studySearch').addEventListener('input', (e)=>{
+  renderStudyList(e.target.value);
+});
+
+/* ---------- TEST MODE (EN -> TR) ---------- */
+let testQueue = [], testIndex = 0, testScore = 0, testTotal = 0;
+
+function startTest(){
+  testQueue = shuffle(wordEntries);
+  testIndex = 0; testScore = 0; testTotal = 0;
+  renderTestQuestion();
+}
+
+function renderTestQuestion(){
+  const area = document.getElementById('testArea');
+  if(testIndex >= testQueue.length){ renderTestResult(); return; }
+  const [en, tr] = testQueue[testIndex];
+  const pct = Math.round((testIndex / testQueue.length) * 100);
+  area.innerHTML = `
+    <div class="quiz-card">
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-label"><span>Soru ${testIndex+1} / ${testQueue.length}</span><span>Doğru: ${testScore}</span></div>
+      <div class="prompt-word">${en.toUpperCase()}</div>
+      <div class="answer-row">
+        <input type="text" id="testInput" placeholder="Türkçe karşılığını yaz..." autocomplete="off">
+        <button id="testSubmit">Gönder</button>
+      </div>
+      <div class="feedback" id="testFeedback"></div>
+    </div>
+    <div class="quiz-footer"><button id="testQuit">Testi bitir</button></div>
+  `;
+  const input = document.getElementById('testInput');
+  input.focus();
+  const submit = ()=>{
+    const val = clean(input.value);
+    if(!val) return;
+    testTotal++;
+    const fb = document.getElementById('testFeedback');
+    if(isCorrectAnswer(val, tr)){
+      testScore++;
+      fb.textContent = '✓ Doğru!';
+      fb.className = 'feedback correct';
+    } else {
+      fb.textContent = '✗ Yanlış! Doğru cevap: ' + tr.split('/').map(s=>s.trim()).join(' veya ');
+      fb.className = 'feedback wrong';
+    }
+    document.getElementById('testSubmit').disabled = true;
+    input.disabled = true;
+    setTimeout(()=>{ testIndex++; renderTestQuestion(); }, 900);
+  };
+  document.getElementById('testSubmit').addEventListener('click', submit);
+  input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') submit(); });
+  document.getElementById('testQuit').addEventListener('click', renderTestResult);
+}
+
+function renderTestResult(){
+  const area = document.getElementById('testArea');
+  area.innerHTML = `
+    <div class="result-box">
+      <div class="tag">Test Bitti</div>
+      <div class="score">${testScore}<span class="of"> / ${testTotal}</span></div>
+      <div class="breakdown">Toplam soru: ${testTotal} · Doğru sayısı: ${testScore}</div>
+      <button class="restart" id="testRestart">Yeniden Başla</button>
+    </div>
+  `;
+  document.getElementById('testRestart').addEventListener('click', startTest);
+}
+
+/* ---------- REPEAT MODE (TR -> EN, until correct) ---------- */
+let repeatTarget = null, repeatPrompt = null, repeatAttempts = 0;
+
+function pickRepeatWord(){
+  const [en, tr] = wordEntries[Math.floor(Math.random()*wordEntries.length)];
+  repeatTarget = en; repeatPrompt = tr; repeatAttempts = 0;
+}
+function startRepeat(){ pickRepeatWord(); renderRepeatQuestion(); }
+
+function renderRepeatQuestion(){
+  const area = document.getElementById('repeatArea');
+  area.innerHTML = `
+    <div class="quiz-card">
+      <div class="progress-label"><span>Doğru bilene kadar tekrar</span><span>${repeatAttempts > 0 ? 'Deneme ' + repeatAttempts : ''}</span></div>
+      <div class="prompt-word">${repeatPrompt.toUpperCase()}</div>
+      <div class="answer-row">
+        <input type="text" id="repeatInput" placeholder="İngilizce karşılığını yaz..." autocomplete="off">
+        <button id="repeatSubmit">Gönder</button>
+      </div>
+      <div class="feedback" id="repeatFeedback"></div>
+    </div>
+    <div class="quiz-footer"><button id="repeatSkip">Yeni kelime</button></div>
+  `;
+  const input = document.getElementById('repeatInput');
+  input.focus();
+  const submit = ()=>{
+    const val = clean(input.value);
+    if(!val) return;
+    repeatAttempts++;
+    const fb = document.getElementById('repeatFeedback');
+    if(isCorrectAnswer(val, repeatTarget)){
+      fb.textContent = '✓ Doğru!';
+      fb.className = 'feedback correct';
+      setTimeout(()=>{ pickRepeatWord(); renderRepeatQuestion(); }, 700);
+    } else {
+      fb.textContent = '✗ Tekrar dene';
+      fb.className = 'feedback wrong';
+      input.value = '';
+      input.focus();
+    }
+  };
+  document.getElementById('repeatSubmit').addEventListener('click', submit);
+  input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') submit(); });
+  document.getElementById('repeatSkip').addEventListener('click', ()=>{ pickRepeatWord(); renderRepeatQuestion(); });
+}
+</script>
+</body>
+</html>
