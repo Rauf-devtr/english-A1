@@ -2,7 +2,7 @@
 
 A1 seviyesindeki Temel İngilizce kelimeleri öğrenmek, test etmek ve pekiştirmek için tasarlanmış web tabanlı interaktif çalışma uygulaması.
 
-[![Live Demo](https://img.shields.io/badge/Canlı_Uygulama-GitHub_Pages-brightgreen?style=for-the-badge&logo=github)](https://Rauf-devtr.github.io/english-a1/)
+[![Live Demo](https://img.shields.io/badge/Canlı_Uygulama-GitHub_Pages-brightgreen?style=for-the-badge&logo=github)](https://Rauf-devtr.github.io/english-A1/)
 
 ---
 
